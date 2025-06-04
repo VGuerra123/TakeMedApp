@@ -1,6 +1,15 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Animated,
+  Easing,
+  Dimensions,
+} from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
+import { BlurView } from 'expo-blur';
 
 interface HealthTipCardProps {
   title: string;
@@ -8,89 +17,185 @@ interface HealthTipCardProps {
   iconName?: React.ReactNode;
 }
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 export function HealthTipCard({ title, description, iconName }: HealthTipCardProps) {
   const theme = useTheme();
-  
+
+  const ringAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (iconName) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(ringAnim, {
+            toValue: 1,
+            duration: 1200,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(ringAnim, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }
+  }, []);
+
+  // Interpolaciones para el anillo del icono
+  const ringScale = ringAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.8],
+  });
+  const ringOpacity = ringAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.4, 0],
+  });
+
   return (
-    <View 
-      style={[
-        styles.container, 
-        { 
-          backgroundColor: theme.colors.cardBackground,
-          borderRadius: theme.borderRadius.lg,
-          ...theme.shadow.sm
-        }
-      ]}
-    >
-      <View style={styles.contentContainer}>
-        {iconName && (
-          <View 
-            style={[
-              styles.iconContainer, 
-              { 
-                backgroundColor: 'rgba(0, 71, 171, 0.1)',
-                borderRadius: theme.borderRadius.md,
-              }
-            ]}
-          >
-            {iconName}
+    <View style={styles.outerWrapper}>
+      <BlurView intensity={30} tint="light" style={styles.blurBackground}>
+        <View
+          style={[
+            styles.cardContainer,
+            {
+              borderRadius: theme.borderRadius.xl,
+              backgroundColor: 'rgba(255,255,255,0.15)',
+              borderColor: 'rgba(255,255,255,0.25)',
+              borderWidth: 1,
+            },
+          ]}
+        >
+          <View style={styles.contentRow}>
+            {iconName && (
+              <View style={styles.iconWrapper}>
+                {/* Anillo pulsante */}
+                <Animated.View
+                  style={[
+                    styles.iconRing,
+                    {
+                      transform: [{ scale: ringScale }],
+                      opacity: ringOpacity,
+                    },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.iconContainer,
+                    {
+                      backgroundColor: 'rgba(0, 174, 239, 0.15)', 
+                      borderRadius: theme.borderRadius.md,
+                    },
+                  ]}
+                >
+                  {iconName}
+                </View>
+              </View>
+            )}
+
+            <View style={styles.textWrapper}>
+              <Text
+                style={[
+                  styles.titleText,
+                  {
+                    color: theme.colors.text.primary,
+                    fontFamily: theme.typography.fontFamily.semiBold,
+                    fontSize: theme.typography.fontSize.lg,
+                    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+                    textShadowOffset: { width: 0, height: 1 },
+                    textShadowRadius: 2,
+                  },
+                ]}
+              >
+                {title}
+              </Text>
+              <Text
+                style={[
+                  styles.descText,
+                  {
+                    color: theme.colors.text.secondary,
+                    fontFamily: theme.typography.fontFamily.regular,
+                    fontSize: theme.typography.fontSize.md,
+                    lineHeight: 20,
+                    opacity: 0.9,
+                  },
+                ]}
+              >
+                {description}
+              </Text>
+            </View>
           </View>
-        )}
-        <View style={styles.textContainer}>
-          <Text 
-            style={[
-              styles.title, 
-              { 
-                color: theme.colors.text.primary,
-                fontFamily: theme.typography.fontFamily.semiBold,
-                fontSize: theme.typography.fontSize.md,
-              }
-            ]}
-          >
-            {title}
-          </Text>
-          <Text 
-            style={[
-              styles.description, 
-              { 
-                color: theme.colors.text.secondary,
-                fontFamily: theme.typography.fontFamily.regular,
-                fontSize: theme.typography.fontSize.sm,
-              }
-            ]}
-          >
-            {description}
-          </Text>
         </View>
-      </View>
+      </BlurView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginVertical: 8,
+  outerWrapper: {
+    marginVertical: 12,
     marginHorizontal: 20,
-    padding: 16,
+    // Sombra de "resplandor azul"
+    shadowColor: '#00AEEF',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 8,
+    borderRadius: 28,
+    overflow: 'hidden',
   },
-  contentContainer: {
+  blurBackground: {
+    borderRadius: 28,
+    padding: 2,
+    ...Platform.select({
+      android: {
+        backgroundColor: 'rgba(255,255,255,0.04)',
+      },
+    }),
+  },
+  cardContainer: {
+    padding: 16,
+    // fallback para iOS: "backdropFilter" no es reconocido en RN nativo
+    ...Platform.select({
+      ios: {
+        backdropFilter: 'blur(12px)',
+      },
+    }),
+  },
+  contentRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  iconWrapper: {
+    width: 52,
+    height: 52,
+    marginRight: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconRing: {
+    position: 'absolute',
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.7)',
+  },
   iconContainer: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 52,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
   },
-  textContainer: {
+  textWrapper: {
     flex: 1,
   },
-  title: {
-    marginBottom: 4,
+  titleText: {
+    marginBottom: 6,
   },
-  description: {
-    lineHeight: 20,
+  descText: {
+    opacity: 0.95,
   },
 });

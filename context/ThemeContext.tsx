@@ -1,30 +1,40 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 
-// Definición de los colores del tema
 export const theme = {
   colors: {
-    primary: '#0047AB',        // Azul principal
-    secondary: '#20B2AA',      // Turquesa secundario
-    accent: '#4CAF50',         // Verde acento
-    background: '#F8FAFC',     // Fondo principal
-    cardBackground: '#FFFFFF', // Fondo de tarjetas
+    // -------- Paleta Principal --------
+    primary: '#0D6EFD',        // Azul Profundo → confianza y profesionalismo
+    secondary: '#20C3B2',      // Verde Azulado Claro → frescura e innovación
+    accent: '#7CE98F',         // Verde Lima Suave → energía y vitalidad
+
+    // -------- Fondos y Superficies --------
+    background: '#E8F6F9',     // Fondo muy claro con ligero tono turquesa
+    cardBackground: '#FFFFFF', // Tarjetas con blanco puro para alto contraste
+
+    // -------- Texto --------
     text: {
-      primary: '#1A1A2E',      // Texto principal
-      secondary: '#4A5568',    // Texto secundario
-      light: '#FFFFFF',        // Texto claro
-      muted: '#718096',        // Texto suavizado
+      primary: '#1E293B',      // Gris oscuro azulado (casi azul marino) para títulos
+      secondary: '#475569',    // Gris medio azulado para subtítulos y cuerpo de texto
+      light: '#FFFFFF',        // Blanco puro para texto sobre fondos oscuros
+      muted: '#94A3B8',        // Gris suave azulado para hint / texto secundario muy tenue
     },
+
+    // -------- Estados / Alertas --------
     status: {
-      success: '#38A169',      // Verde éxito
-      warning: '#F59E0B',      // Amarillo advertencia
-      error: '#E53E3E',        // Rojo error
-      info: '#3182CE',         // Azul información
+      success: '#22C55E',      // Verde intenso para éxito
+      warning: '#FACC15',      // Amarillo vivo para advertencias
+      error: '#EF4444',        // Rojo vibrante para errores
+      info: '#3B82F6',         // Azul vivo para información (ligeramente diferente al primary)
     },
+
+    // -------- Degradados --------
     gradient: {
-      start: '#0047AB',        // Inicio de gradiente
-      end: '#20B2AA',          // Fin de gradiente
+      start: '#0D6EFD',        // Mismo que primary
+      end: '#20C3B2',          // Segundo color turquesa claro
     }
   },
+
+  // -------- Espaciados --------
   spacing: {
     xs: 4,
     sm: 8,
@@ -33,16 +43,21 @@ export const theme = {
     xl: 32,
     xxl: 48,
   },
+
+  // -------- Radios de Borde --------
   borderRadius: {
-    sm: 4,
-    md: 8,
-    lg: 12,
-    xl: 20,
+    sm: 6,
+    md: 10,
+    lg: 16,
+    xl: 28,
     full: 9999,
   },
+
+  // -------- Tipografía --------
   typography: {
     fontFamily: {
       regular: 'Poppins-Regular',
+      medium: 'Poppins-Medium',
       semiBold: 'Poppins-SemiBold',
       bold: 'Poppins-Bold',
     },
@@ -54,41 +69,41 @@ export const theme = {
       xl: 20,
       xxl: 24,
       xxxl: 32,
-    }
+    },
   },
+
+  // -------- Sombras --------
   shadow: {
     sm: {
-      shadowColor: '#000',
+      shadowColor: '#0D6EFD',      // Sombra suave con el color primario
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.18,
-      shadowRadius: 1.0,
-      elevation: 1,
+      shadowOpacity: 0.10,
+      shadowRadius: 2,
+      elevation: 2,
     },
     md: {
-      shadowColor: '#000',
+      shadowColor: '#0D6EFD',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.23,
-      shadowRadius: 2.62,
-      elevation: 4,
+      shadowOpacity: 0.15,
+      shadowRadius: 4,
+      elevation: 5,
     },
     lg: {
-      shadowColor: '#000',
+      shadowColor: '#0D6EFD',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.30,
-      shadowRadius: 4.65,
-      elevation: 8,
-    }
-  }
+      shadowOpacity: 0.20,
+      shadowRadius: 6,
+      elevation: 10,
+    },
+  },
 };
 
 const ThemeContext = createContext(theme);
 
 export const useTheme = () => useContext(ThemeContext);
 
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  return (
-    <ThemeContext.Provider value={theme}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
+export const ThemeProvider = ({ children }: { children: ReactNode }) => (
+  <ThemeContext.Provider value={theme}>
+    {children}
+  </ThemeContext.Provider>
+);

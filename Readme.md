@@ -12,6 +12,7 @@ Asegúrate de tener instalado **Node.js** y **Expo CLI**. Si no tienes Expo CLI 
 2. Ejecuta el siguiente comando para iniciar el servidor de desarrollo:
 
    ```bash
+   npm install
    npx expo start -c
 
 y luego ctrl+clic sobre http://localhost:8081/
